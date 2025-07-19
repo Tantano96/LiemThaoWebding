@@ -745,16 +745,23 @@
     requestAnimationFrame(animateHearts);
 
     // Hiệu ứng zoom ảnh
+    // Inside your <script type="module"> block
     function openModal(src) {
+      console.log('Opening modal with src:', src); // For debugging
       const modal = document.getElementById('modal');
       const modalImage = document.getElementById('modal-image');
       modalImage.src = src;
       modal.style.display = 'flex';
     }
+
     function closeModal() {
       const modal = document.getElementById('modal');
       modal.style.display = 'none';
     }
+
+    // Expose functions to the global scope
+    window.openModal = openModal;
+    window.closeModal = closeModal;
 
     // Xử lý form RSVP và lưu vào Firestore
     document.getElementById('submit-btn').addEventListener('click', async function () {
