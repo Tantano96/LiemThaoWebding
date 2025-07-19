@@ -240,8 +240,8 @@
       border-bottom: 1px solid #e6f3fa;
     }
     .calendar-table th {
-      background: #007BFF;
-      color: white;
+      background: #007bff2a;
+      color: #0054ad;
       font-weight: 600;
       font-size: 1.1rem;
       text-align: center;
@@ -329,12 +329,18 @@
       border: 2px solid #007BFF;
       box-shadow: 0 4px 12px rgba(0, 85, 165, 0.2);
     }
+    .line-path {
+      display: block !important;
+    }
     @media (max-width: 768px) {
+      .line-path {
+        display: none !important;
+      }
       .hamburger {
         display: block;
       }
       .nav-menu {
-        display: none;
+        display: none !important;
         flex-direction: column;
         position: absolute;
         top: 100%;
@@ -345,7 +351,7 @@
         padding: 1rem;
       }
       .nav-menu.active {
-        display: flex;
+        display: flex !important;
       }
       .section-title {
         font-size: 2rem;
@@ -474,7 +480,7 @@
     <div class="container mx-auto px-4">
       <h2 class="cursive section-title">Hành Trình Tình Yêu</h2>
       <div class="relative max-w-3xl mx-auto">
-        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-200"></div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-200 line-path"></div>
         <div class="mb-12 flex items-center w-full flex-col md:flex-row">
           <div class="w-full md:w-1/2 pr-0 md:pr-8 text-center md:text-right">
             <h3 class="text-lg font-semibold text-blue-600">Ngày Gặp Gỡ</h3>
