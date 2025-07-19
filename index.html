@@ -1,9 +1,48 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anh & Huyền Wedding</title>
+  <title>Liêm & Thảo Wedding</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;700&display=swap');
@@ -15,11 +54,10 @@
       position: relative;
     }
     .cursive {
-      font-family: 'Great Vibes', cursive;
+      font-family: 'Great Vibes', cursive !important;
       color: #007BFF;
     }
     .section-title {
-      font-family: 'Playfair Display', serif;
       font-size: 2.5rem;
       line-height: 1.2;
       margin-bottom: 2rem;
@@ -83,7 +121,11 @@
     }
     .photo-card:hover {
       transform: scale(1.1);
-      box-shadow: 0 10px 20px rgba(0, 85, 165, 0.3);
+    }
+    .photo-card:hover img{
+      transform: scale(1.1);
+      transition: ease-in-out 0.5s;
+      box-shadow: 0 15px 20px #007bffbd;
     }
     .groom-bride-img {
       transition: transform 0.5s ease, box-shadow 0.3s ease, border-color 0.3s ease;
@@ -130,15 +172,28 @@
       cursor: pointer;
     }
     .header-bg {
-      background: url('https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') center/cover;
-      padding: 2rem;
+      background: url('https://anhdunghoanghuyen.iwedding.info/templates/template5/img/header-love-bg.png') center/cover;
+      padding: 9rem;
       border-radius: 1rem;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(8px);
+    }
+    .header-bg h2 {
+      font-weight: bolder;
+      color: white;
+    }
+    .header-bg h1{
+      font-weight: bolder;
+      color: white
+    }
+    .header-bg h5{
+      font-weight: bolder;
+      color: white
     }
     .fade-in {
       opacity: 0;
       transform: translateY(50px);
       transition: opacity 0.6s ease, transform 0.6s ease;
+      cursor: pointer;
     }
     .fade-in.visible {
       opacity: 1;
@@ -332,29 +387,29 @@
   <nav class="nav-sticky bg-white shadow-md py-4">
     <div class="container mx-auto px-4 flex justify-between items-center">
       <div class="flex items-center gap-2">
-        <span class="text-lg cursive">Anh</span>
-        <span class="text-blue-400">♥</span>
-        <span class="text-lg cursive">Huyền</span>
+        <span class="text-xl text-bold cursive">Liêm</span>
+        <span class="text-xltext-bold cursive" style="color: red;">♥</span>
+        <span class="text-xl text-bold cursive">Thảo</span>
       </div>
       <div class="hamburger">☰</div>
       <div class="nav-menu flex gap-6">
-        <a href="#story" class="text-gray-600 hover:text-blue-400">Câu Chuyện</a>
-        <a href="#timeline" class="text-gray-600 hover:text-blue-400">Hành Trình</a>
-        <a href="#gallery" class="text-gray-600 hover:text-blue-400">Album</a>
-        <a href="#rsvp" class="text-gray-600 hover:text-blue-400">Gửi Quà</a>
+        <a href="#story" class="text-blue-600 text-bold hover:text-blue-300">Cặp đôi</a>
+        <a href="#timeline" class="text-blue-600 text-bold hover:text-blue-300">Hành Trình</a>
+        <a href="#gallery" class="text-blue-600 text-bold hover:text-blue-300">Album</a>
+        <a href="#rsvp" class="text-blue-600 text-bold hover:text-blue-300">Gửi Quà</a>
       </div>
     </div>
   </nav>
 
   <!-- Banner chính -->
-  <section id="home" class="relative h-screen bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
+  <section id="home" class="relative h-screen bg-cover bg-center" style="background-image: url('https://liemthao1996.my.canva.site/_assets/media/3b394a58ee1c8effaa9ec269e6448106.png');">
     <div class="absolute inset-0 bg-overlay"></div>
     <div class="relative flex flex-col items-center justify-center h-full text-center text-white">
       <div class="header-bg">
-        <h2 class="text-2xl md:text-3xl mb-4">We're Getting Married</h2>
-        <h1 class="text-4xl md:text-6xl cursive">Anh & Huyền</h1>
+        <h2 class="text-2xl md:text-3xl mb-4 cursive">We're Getting Married</h2>
+        <h1 class="text-4xl md:text-6xl cursive">Liêm ♥ Thảo</h1>
+        <h5 class="text-lg md:text-2xl mt-4 cursive">28 - 07 - 2015</p>
       </div>
-      <p class="text-lg md:text-2xl mt-4">20.12.2025</p>
       <div id="countdown" class="text-base md:text-xl mt-6 flex gap-4 justify-center flex-wrap">
         <div><span id="days">0</span> Ngày</div>
         <div><span id="hours">0</span> Giờ</div>
@@ -370,17 +425,19 @@
   <!-- Thông tin cặp đôi -->
   <section id="story" class="py-12 bg-white">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="cursive section-title">Câu Chuyện Tình Yêu</h2>
+      <h2 class="section-title cursive">Cặp đôi</h2>
       <div class="flex flex-col md:flex-row gap-8 justify-center">
         <div class="flex-1 max-w-xs">
-          <img src="https://images.unsplash.com/photo-1507027704470-9e8b1bd14890?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Groom" class="groom-bride-img w-56 h-56 rounded-full mx-auto mb-4 object-cover">
-          <h3 class="text-xl font-semibold text-blue-600">Anh</h3>
-          <p class="text-gray-600 mt-2">Một chàng trai đam mê công nghệ, yêu thích khám phá và luôn mang đến nụ cười cho người xung quanh.</p>
+          <img src="https://liemthao1996.my.canva.site/_assets/media/3b394a58ee1c8effaa9ec269e6448106.png" alt="Groom" class="groom-bride-img w-56 h-56 rounded-full mx-auto mb-4 object-cover">
+          <h3 class="text-xl font-semibold text-blue-600 cursive" style="font-size: 30px;">Trương Thanh Liêm</h3>
+          <p class="text-gray-600 mt-2">Con ông: <b>Trương Văn Luyến</b></p>
+          <p class="text-gray-600 mt-2">Con bà: <b>Nguyễn Thị Phàn</b></p>
         </div>
         <div class="flex-1 max-w-xs">
-          <img src="https://images.unsplash.com/photo-1519706884-1f0d0b4c828e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Bride" class="groom-bride-img w-56 h-56 rounded-full mx-auto mb-4 object-cover">
-          <h3 class="text-xl font-semibold text-blue-600">Huyền</h3>
-          <p class="text-gray-600 mt-2">Một cô gái dịu dàng, yêu nghệ thuật và luôn tìm thấy niềm vui trong những điều giản dị.</p>
+          <img src="https://liemthao1996.my.canva.site/_assets/media/3b394a58ee1c8effaa9ec269e6448106.png" alt="Bride" class="groom-bride-img w-56 h-56 rounded-full mx-auto mb-4 object-cover">
+          <h3 class="text-xl font-semibold text-blue-600 cursive" style="font-size: 30px;">Đàm Thu Thảo</h3>
+          <p class="text-gray-600 mt-2">Con ông: <b>Đàm Văn X</b></p>
+          <p class="text-gray-600 mt-2">Con bà: <b>Đàm Thị Y</b></p>
         </div>
       </div>
     </div>
@@ -444,24 +501,30 @@
   <section id="gallery" class="py-12 bg-white">
     <div class="container mx-auto px-4">
       <h2 class="cursive section-title">Album</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
-          <img src="https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 1" class="w-full h-64 object-cover rounded-lg shadow-md">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/e3bba2cc55e0717238fd37a2a332db64.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/e3bba2cc55e0717238fd37a2a332db64.png" alt="Gallery 2" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
-        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1511285560929-80b4564d73d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
-          <img src="https://images.unsplash.com/photo-1511285560929-80b4564d73d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 2" class="w-full h-64 object-cover rounded-lg shadow-md">
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/3b394a58ee1c8effaa9ec269e6448106.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/3b394a58ee1c8effaa9ec269e6448106.png" alt="Gallery 1" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
-        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519748771451-4a3950ed7462?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
-          <img src="https://images.unsplash.com/photo-1519748771451-4a3950ed7462?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 3" class="w-full h-64 object-cover rounded-lg shadow-md">
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/cd46405653df656fcb5380276247638e.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/cd46405653df656fcb5380276247638e.png" alt="Gallery 3" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
-        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
-          <img src="https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 4" class="w-full h-64 object-cover rounded-lg shadow-md">
+         <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/a788f2e165b561d6c75fb3c0b63f4528.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/a788f2e165b561d6c75fb3c0b63f4528.png" alt="Gallery 5" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
-        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1527527753514-2c84b332c858?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
-          <img src="https://images.unsplash.com/photo-1527527753514-2c84b332c858?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 5" class="w-full h-64 object-cover rounded-lg shadow-md">
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/a788f2e165b561d6c75fb3c0b63f4528.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/a788f2e165b561d6c75fb3c0b63f4528.png" alt="Gallery 5" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
-        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519225422858-3f0e6b4e34f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
-          <img src="https://images.unsplash.com/photo-1519225422858-3f0e6b4e34f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 6" class="w-full h-64 object-cover rounded-lg shadow-md">
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/e3bba2cc55e0717238fd37a2a332db64.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/e3bba2cc55e0717238fd37a2a332db64.png" alt="Gallery 6" class="w-full h-128 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/a788f2e165b561d6c75fb3c0b63f4528.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/a788f2e165b561d6c75fb3c0b63f4528.png" alt="Gallery 5" class="w-full h-128 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/cd46405653df656fcb5380276247638e.png')">
+          <img src="https://liemthao1996.my.canva.site/_assets/media/cd46405653df656fcb5380276247638e.png" alt="Gallery 3" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
       </div>
     </div>
@@ -472,41 +535,6 @@
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modal-image" src="" alt="Zoomed Image">
   </div>
-
-  <!-- Form Gửi Quà & QR Code -->
-  <section id="rsvp" class="py-12 bg-[#E6F3FA]">
-    <div class="container mx-auto px-4">
-      <h2 class="cursive section-title">Gửi Quà</h2>
-      <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md backdrop-filter blur(3px)">
-        <div id="rsvp-form" class="space-y-4">
-          <div>
-            <label class="block text-gray-700 font-semibold">Họ Tên</label>
-            <input type="text" id="name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400" placeholder="Nhập họ tên của bạn">
-          </div>
-          <div>
-            <label class="block text-gray-700 font-semibold">Bạn sẽ tham dự?</label>
-            <select id="attending" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400">
-              <option value="">Chọn</option>
-              <option value="Có">Có</option>
-              <option value="Không">Không</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-gray-700 font-semibold">Lời Nhắn</label>
-            <textarea id="message" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400" placeholder="Gửi lời chúc đến chúng tôi" rows="4"></textarea>
-          </div>
-          <button id="submit-btn" class="w-full bg-blue-400 text-white p-2 rounded-lg hover:bg-blue-500 transition">Gửi Xác Nhận</button>
-        </div>
-        <div id="rsvp-list" class="mt-4 text-gray-600"></div>
-        <div class="qr-section">
-          <h3 class="text-lg font-semibold text-blue-600 mt-6">Gửi Quà Tặng</h3>
-          <p class="text-gray-600 mb-4">Quét mã QR để gửi quà cưới qua tài khoản ngân hàng hoặc ứng dụng thanh toán.</p>
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/payment" alt="Payment QR Code" class="mx-auto">
-          <p class="text-sm text-gray-500 mt-2">Ví dụ: Quét để chuyển khoản qua Momo hoặc ngân hàng.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Lịch & Bản đồ -->
   <section id="calendar" class="py-12 bg-white">
@@ -573,6 +601,44 @@
       </div>
     </div>
   </section>
+
+
+  <!-- Form Gửi Quà & QR Code -->
+  <section id="rsvp" class="py-12 bg-[#E6F3FA]">
+    <div class="container mx-auto px-4">
+      <h2 class="cursive section-title">Gửi Quà</h2>
+      <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md backdrop-filter blur(3px)">
+        <div id="rsvp-form" class="space-y-4">
+          <div>
+            <label class="block text-gray-700 font-semibold">Họ Tên</label>
+            <input type="text" id="name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400" placeholder="Nhập họ tên của bạn">
+          </div>
+          <div>
+            <label class="block text-gray-700 font-semibold">Bạn sẽ tham dự?</label>
+            <select id="attending" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400">
+              <option value="">Chọn</option>
+              <option value="Có">Có</option>
+              <option value="Không">Không</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-700 font-semibold">Lời Nhắn</label>
+            <textarea id="message" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400" placeholder="Gửi lời chúc đến chúng tôi" rows="4"></textarea>
+          </div>
+          <button id="submit-btn" class="w-full bg-blue-400 text-white p-2 rounded-lg hover:bg-blue-500 transition">Gửi Xác Nhận</button>
+        </div>
+        <div id="rsvp-list" class="mt-4 text-gray-600"></div>
+        <div class="qr-section">
+          <h3 class="text-lg font-semibold text-blue-600 mt-6">Gửi Quà Tặng</h3>
+          <p class="text-gray-600 mb-4">Quét mã QR để gửi quà cưới qua tài khoản ngân hàng hoặc ứng dụng thanh toán.</p>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/payment" alt="Payment QR Code" class="mx-auto">
+          <p class="text-sm text-gray-500 mt-2">Ví dụ: Quét để chuyển khoản qua Momo hoặc ngân hàng.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
 
   <!-- Footer -->
   <footer class="py-8 bg-[#0055A5] text-white text-center">
@@ -681,27 +747,6 @@
         alert('Vui lòng điền đầy đủ họ tên và trạng thái tham dự!');
       }
     });
-
-    // Cập nhật danh sách RSVP từ Firestore
-    function updateRSVPList() {
-      const rsvpDisplay = document.getElementById('rsvp-list');
-      const q = query(collection(db, 'rsvp'), orderBy('timestamp', 'desc'));
-      onSnapshot(q, (snapshot) => {
-        const rsvpList = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          rsvpList.push(data);
-        });
-        rsvpDisplay.innerHTML = rsvpList.length 
-          ? '<h4 class="font-semibold text-blue-600">Danh sách xác nhận:</h4>' + 
-            rsvpList.map(r => `<p>${r.name} - ${r.attending} (${new Date(r.timestamp).toLocaleString()})</p>`).join('')
-          : '';
-      }, (error) => {
-        console.error('Error fetching RSVPs: ', error);
-        rsvpDisplay.innerHTML = '<p class="text-red-600">Không thể tải danh sách xác nhận. Vui lòng thử lại sau!</p>';
-      });
-    }
-    updateRSVPList();
 
     // Hiệu ứng fade-in khi cuộn đến
     function checkFadeIn() {
