@@ -1,43 +1,3 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script>```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -46,7 +6,7 @@
   <title>Anh & Huyền Wedding</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;700&display=swap');
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #E6F3FA;
@@ -59,10 +19,12 @@
       color: #007BFF;
     }
     .section-title {
+      font-family: 'Playfair Display', serif;
       font-size: 2.5rem;
       line-height: 1.2;
       margin-bottom: 2rem;
       color: #0055A5;
+      text-align: center;
     }
     .bg-overlay {
       background: linear-gradient(rgba(0, 85, 165, 0.4), rgba(0, 85, 165, 0.4));
@@ -85,7 +47,7 @@
       background: none;
       transform: rotate(-45deg);
       opacity: 0.7;
-      animation: fall 6s linear forwards; /* Slower fall (6s) */
+      animation: fall 6s linear forwards;
       will-change: transform, opacity;
     }
     .heart::before,
@@ -185,53 +147,66 @@
     .calendar-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 1.5rem;
+      gap: 2rem;
       justify-content: center;
-      max-width: 800px;
+      max-width: 1000px;
       margin: 0 auto;
     }
     .calendar {
       flex: 1;
-      min-width: 300px;
-      border: 2px solid #007BFF;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 85, 165, 0.2);
-      backdrop-filter: blur(3px);
+      min-width: 320px;
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 6px 16px rgba(0, 85, 165, 0.15);
+      border: 1px solid #e6f3fa;
+      backdrop-filter: blur(4px);
     }
     .calendar-day {
-      font-weight: bold;
-      font-size: 1.25rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
       color: #0055A5;
-      padding: 0.5rem;
       text-align: center;
+      padding: 0.75rem;
+      background: #e6f3fa;
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
     .calendar-table {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 0.5rem;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-family: 'Poppins', sans-serif;
     }
     .calendar-table th, .calendar-table td {
-      border: 1px solid #E6F3FA;
       padding: 0.75rem;
       text-align: left;
+      border-bottom: 1px solid #e6f3fa;
     }
     .calendar-table th {
-      background-color: #007BFF;
+      background: #007BFF;
       color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
       text-align: center;
+      border-radius: 6px 6px 0 0;
     }
     .calendar-table td {
-      background-color: #F8FAFC;
-    }
-    .calendar-event {
+      background: #ffffff;
       font-size: 1rem;
       color: #4A4A4A;
-      margin-top: 1rem;
+    }
+    .calendar-table tr:last-child td {
+      border-bottom: none;
+    }
+    .calendar-event {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: #0055A5;
+      margin-top: 1.5rem;
       text-align: center;
     }
-    /* Responsive Menu */
     .hamburger {
       display: none;
       font-size: 1.5rem;
@@ -239,6 +214,65 @@
     }
     .nav-menu {
       display: flex;
+    }
+    .qr-section {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .qr-section img {
+      width: 150px;
+      height: 150px;
+      border: 3px solid #007BFF;
+      border-radius: 8px;
+      margin: 0.5rem auto;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .qr-section img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 85, 165, 0.3);
+    }
+    .map-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 85, 165, 0.15);
+      border: 1px solid #e6f3fa;
+      backdrop-filter: blur(4px);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .map-section h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #0055A5;
+      margin-bottom: 1rem;
+    }
+    .map-section p {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      color: #4A4A4A;
+      margin-bottom: 1rem;
+    }
+    .map-section img {
+      width: 120px;
+      height: 120px;
+      border: 3px solid #007BFF;
+      border-radius: 8px;
+      margin: 0.5rem auto;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .map-section img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 85, 165, 0.3);
+    }
+    .map-section iframe {
+      width: 100%;
+      height: 300px;
+      border-radius: 12px;
+      border: 2px solid #007BFF;
+      box-shadow: 0 4px 12px rgba(0, 85, 165, 0.2);
     }
     @media (max-width: 768px) {
       .hamburger {
@@ -260,6 +294,26 @@
       }
       .section-title {
         font-size: 2rem;
+      }
+      .calendar {
+        min-width: 280px;
+      }
+      .calendar-day {
+        font-size: 1.5rem;
+      }
+      .calendar-table th, .calendar-table td {
+        font-size: 0.95rem;
+        padding: 0.5rem;
+      }
+      .map-section {
+        padding: 1rem;
+      }
+      .map-section iframe {
+        height: 250px;
+      }
+      .map-section img {
+        width: 100px;
+        height: 100px;
       }
     }
   </style>
@@ -335,7 +389,7 @@
   <!-- Timeline sự kiện -->
   <section id="timeline" class="py-12 bg-[#E6F3FA]">
     <div class="container mx-auto px-4">
-      <h2 class="cursive section-title text-center">Hành Trình Tình Yêu</h2>
+      <h2 class="cursive section-title">Hành Trình Tình Yêu</h2>
       <div class="relative max-w-3xl mx-auto">
         <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-200"></div>
         <div class="mb-12 flex items-center w-full flex-col md:flex-row">
@@ -389,7 +443,7 @@
   <!-- Album ảnh -->
   <section id="gallery" class="py-12 bg-white">
     <div class="container mx-auto px-4">
-      <h2 class="cursive section-title text-center">Album</h2>
+      <h2 class="cursive section-title">Album</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
           <img src="https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 1" class="w-full h-64 object-cover rounded-lg shadow-md">
@@ -419,10 +473,10 @@
     <img id="modal-image" src="" alt="Zoomed Image">
   </div>
 
-  <!-- Form Gửi Quà -->
+  <!-- Form Gửi Quà & QR Code -->
   <section id="rsvp" class="py-12 bg-[#E6F3FA]">
     <div class="container mx-auto px-4">
-      <h2 class="cursive section-title text-center">Gửi Quà</h2>
+      <h2 class="cursive section-title">Gửi Quà</h2>
       <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md backdrop-filter blur(3px)">
         <div id="rsvp-form" class="space-y-4">
           <div>
@@ -444,11 +498,17 @@
           <button id="submit-btn" class="w-full bg-blue-400 text-white p-2 rounded-lg hover:bg-blue-500 transition">Gửi Xác Nhận</button>
         </div>
         <div id="rsvp-list" class="mt-4 text-gray-600"></div>
+        <div class="qr-section">
+          <h3 class="text-lg font-semibold text-blue-600 mt-6">Gửi Quà Tặng</h3>
+          <p class="text-gray-600 mb-4">Quét mã QR để gửi quà cưới qua tài khoản ngân hàng hoặc ứng dụng thanh toán.</p>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/payment" alt="Payment QR Code" class="mx-auto">
+          <p class="text-sm text-gray-500 mt-2">Ví dụ: Quét để chuyển khoản qua Momo hoặc ngân hàng.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Lịch -->
+  <!-- Lịch & Bản đồ -->
   <section id="calendar" class="py-12 bg-white">
     <div class="container mx-auto px-4 text-center">
       <h2 class="cursive section-title">Lịch Đám Cưới</h2>
@@ -473,7 +533,7 @@
               </tr>
               <tr>
                 <td>18:00</td>
-                <td>Lễ cưới</td>
+                <td>Tiệc cưới</td>
               </tr>
             </tbody>
           </table>
@@ -498,13 +558,19 @@
               </tr>
               <tr>
                 <td>18:00</td>
-                <td>Lễ cưới</td>
+                <td>Tiệc cưới</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div class="calendar-event mt-4">Địa điểm: Trung tâm Tiệc cưới Hà Nội, 123 Đường Láng, Hà Nội</div>
+      <div class="calendar-event">Địa điểm: Trung tâm Tiệc cưới Hà Nội, 123 Đường Láng, Hà Nội</div>
+      <div class="map-section">
+        <h3 class="fade-in">Bản Đồ Địa Điểm</h3>
+        <p class="fade-in">Quét mã QR hoặc nhấp vào bản đồ để điều hướng đến địa điểm tiệc cưới.</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://maps.google.com/?q=123+Đường+Láng,+Hà+Nội" alt="Map QR Code" class="mx-auto fade-in">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.5062000000003!2d105.801944!3d21.011305!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDAwJzQwLjciTiAxMDXCsDQ4JzA3LjAiRQ!5e0!3m2!1svi!2s!4v1634567890123" allowfullscreen="" loading="lazy" class="fade-in"></iframe>
+      </div>
     </div>
   </section>
 
@@ -562,13 +628,13 @@
       const heart = document.createElement('div');
       heart.classList.add('heart');
       heart.style.left = Math.random() * 100 + 'vw';
-      heart.style.animationDuration = Math.random() * 2 + 6 + 's'; // Random duration between 6-8s
+      heart.style.animationDuration = Math.random() * 2 + 6 + 's';
       heart.style.opacity = Math.random() * 0.5 + 0.3;
       heartContainer.appendChild(heart);
-      setTimeout(() => heart.remove(), 8000); // Remove after 8s to match max animation
+      setTimeout(() => heart.remove(), 8000);
     }
     function animateHearts(timestamp) {
-      if (!lastHeartTime || timestamp - lastHeartTime > 2000) { // Create heart every 2s
+      if (!lastHeartTime || timestamp - lastHeartTime > 2000) {
         createHeart();
         lastHeartTime = timestamp;
       }
@@ -658,4 +724,3 @@
   </script>
 </body>
 </html>
-```
