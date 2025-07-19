@@ -768,11 +768,11 @@
         const body = {
           status: 0,
           order: 0,
-          extraData: attending,
+          extraData: "",
           name: name,
           phone: "", // có thể thay bằng giá trị nhập nếu muốn
           birthday: new Date().toISOString(), // hoặc để người dùng nhập
-          academicAbility: "",
+          academicAbility: attending,
           isAdvice: true,
           comment: message
         };
