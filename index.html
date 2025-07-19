@@ -1,0 +1,661 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anh & Huyền Wedding</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #E6F3FA;
+      color: #4A4A4A;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .cursive {
+      font-family: 'Great Vibes', cursive;
+      color: #007BFF;
+    }
+    .section-title {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+      color: #0055A5;
+    }
+    .bg-overlay {
+      background: linear-gradient(rgba(0, 85, 165, 0.4), rgba(0, 85, 165, 0.4));
+      backdrop-filter: blur(3px);
+    }
+    .heart-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: none;
+      transform: rotate(-45deg);
+      opacity: 0.7;
+      animation: fall 6s linear forwards; /* Slower fall (6s) */
+      will-change: transform, opacity;
+    }
+    .heart::before,
+    .heart::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #007BFF;
+      border-radius: 50%;
+    }
+    .heart::before {
+      top: -10px;
+      left: 0;
+    }
+    .heart::after {
+      left: 10px;
+      top: 0;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-20px) rotate(-45deg) scale(1);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(calc(100vh - 20px)) rotate(-45deg) scale(0.5);
+        opacity: 0;
+      }
+    }
+    .photo-card {
+      transition: transform 0.5s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+    .photo-card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 10px 20px rgba(0, 85, 165, 0.3);
+    }
+    .groom-bride-img {
+      transition: transform 0.5s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      border: 4px solid #E6F3FA;
+      filter: brightness(0.95);
+    }
+    .groom-bride-img:hover {
+      transform: scale(1.15);
+      box-shadow: 0 15px 30px rgba(0, 85, 165, 0.3);
+      border-color: #007BFF;
+      filter: brightness(1);
+    }
+    .nav-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(5px);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 85, 165, 0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      filter: brightness(0.9);
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+    .header-bg {
+      background: url('https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') center/cover;
+      padding: 2rem;
+      border-radius: 1rem;
+      backdrop-filter: blur(4px);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .calendar-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .calendar {
+      flex: 1;
+      min-width: 300px;
+      border: 2px solid #007BFF;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 85, 165, 0.2);
+      backdrop-filter: blur(3px);
+    }
+    .calendar-day {
+      font-weight: bold;
+      font-size: 1.25rem;
+      color: #0055A5;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    .calendar-table th, .calendar-table td {
+      border: 1px solid #E6F3FA;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    .calendar-table th {
+      background-color: #007BFF;
+      color: white;
+      text-align: center;
+    }
+    .calendar-table td {
+      background-color: #F8FAFC;
+    }
+    .calendar-event {
+      font-size: 1rem;
+      color: #4A4A4A;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    /* Responsive Menu */
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .nav-menu {
+      display: flex;
+    }
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+        padding: 1rem;
+      }
+      .nav-menu.active {
+        display: flex;
+      }
+      .section-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Heart Container -->
+  <div class="heart-container"></div>
+
+  <!-- Nhạc nền -->
+  <audio id="background-music" autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-sweet.mp3" type="audio/mpeg">
+    Trình duyệt của bạn không hỗ trợ âm thanh.
+  </audio>
+
+  <!-- Menu điều hướng -->
+  <nav class="nav-sticky bg-white shadow-md py-4">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="text-lg cursive">Anh</span>
+        <span class="text-blue-400">♥</span>
+        <span class="text-lg cursive">Huyền</span>
+      </div>
+      <div class="hamburger">☰</div>
+      <div class="nav-menu flex gap-6">
+        <a href="#story" class="text-gray-600 hover:text-blue-400">Câu Chuyện</a>
+        <a href="#timeline" class="text-gray-600 hover:text-blue-400">Hành Trình</a>
+        <a href="#gallery" class="text-gray-600 hover:text-blue-400">Album</a>
+        <a href="#rsvp" class="text-gray-600 hover:text-blue-400">Gửi Quà</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Banner chính -->
+  <section id="home" class="relative h-screen bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
+    <div class="absolute inset-0 bg-overlay"></div>
+    <div class="relative flex flex-col items-center justify-center h-full text-center text-white">
+      <div class="header-bg">
+        <h2 class="text-2xl md:text-3xl mb-4">We're Getting Married</h2>
+        <h1 class="text-4xl md:text-6xl cursive">Anh & Huyền</h1>
+      </div>
+      <p class="text-lg md:text-2xl mt-4">20.12.2025</p>
+      <div id="countdown" class="text-base md:text-xl mt-6 flex gap-4 justify-center flex-wrap">
+        <div><span id="days">0</span> Ngày</div>
+        <div><span id="hours">0</span> Giờ</div>
+        <div><span id="minutes">0</span> Phút</div>
+        <div><span id="seconds">0</span> Giây</div>
+      </div>
+      <div class="mt-8">
+        <a href="#rsvp" class="inline-block bg-transparent border-2 border-white text-white py-2 px-6 rounded-full hover:bg-blue-400 hover:text-white hover:border-blue-400 transition">Gửi Quà</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Thông tin cặp đôi -->
+  <section id="story" class="py-12 bg-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="cursive section-title">Câu Chuyện Tình Yêu</h2>
+      <div class="flex flex-col md:flex-row gap-8 justify-center">
+        <div class="flex-1 max-w-xs">
+          <img src="https://images.unsplash.com/photo-1507027704470-9e8b1bd14890?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Groom" class="groom-bride-img w-56 h-56 rounded-full mx-auto mb-4 object-cover">
+          <h3 class="text-xl font-semibold text-blue-600">Anh</h3>
+          <p class="text-gray-600 mt-2">Một chàng trai đam mê công nghệ, yêu thích khám phá và luôn mang đến nụ cười cho người xung quanh.</p>
+        </div>
+        <div class="flex-1 max-w-xs">
+          <img src="https://images.unsplash.com/photo-1519706884-1f0d0b4c828e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Bride" class="groom-bride-img w-56 h-56 rounded-full mx-auto mb-4 object-cover">
+          <h3 class="text-xl font-semibold text-blue-600">Huyền</h3>
+          <p class="text-gray-600 mt-2">Một cô gái dịu dàng, yêu nghệ thuật và luôn tìm thấy niềm vui trong những điều giản dị.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline sự kiện -->
+  <section id="timeline" class="py-12 bg-[#E6F3FA]">
+    <div class="container mx-auto px-4">
+      <h2 class="cursive section-title text-center">Hành Trình Tình Yêu</h2>
+      <div class="relative max-w-3xl mx-auto">
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-200"></div>
+        <div class="mb-12 flex items-center w-full flex-col md:flex-row">
+          <div class="w-full md:w-1/2 pr-0 md:pr-8 text-center md:text-right">
+            <h3 class="text-lg font-semibold text-blue-600">Ngày Gặp Gỡ</h3>
+            <p class="text-gray-600">15.03.2023</p>
+            <p class="text-gray-600">Một buổi chiều mưa định mệnh tại Hà Nội đã đưa chúng tôi đến với nhau.</p>
+          </div>
+          <div class="w-full md:w-1/12 flex justify-center">
+            <div class="w-6 h-6 bg-blue-400 rounded-full border-4 border-white"></div>
+          </div>
+          <div class="hidden md:block w-1/2"></div>
+        </div>
+        <div class="mb-12 flex items-center w-full flex-col md:flex-row-reverse">
+          <div class="w-full md:w-1/2 pl-0 md:pl-8 text-center md:text-left">
+            <h3 class="text-lg font-semibold text-blue-600">Hẹn Hò Đầu Tiên</h3>
+            <p class="text-gray-600">20.06.2023</p>
+            <p class="text-gray-600">Buổi tối lãng mạn bên Hồ Gươm, nơi tình yêu bắt đầu nở rộ.</p>
+          </div>
+          <div class="w-full md:w-1/12 flex justify-center">
+            <div class="w-6 h-6 bg-blue-400 rounded-full border-4 border-white"></div>
+          </div>
+          <div class="hidden md:block w-1/2"></div>
+        </div>
+        <div class="mb-12 flex items-center w-full flex-col md:flex-row">
+          <div class="w-full md:w-1/2 pr-0 md:pr-8 text-center md:text-right">
+            <h3 class="text-lg font-semibold text-blue-600">Cầu Hôn</h3>
+            <p class="text-gray-600">01.01.2024</p>
+            <p class="text-gray-600">Khoảnh khắc đáng nhớ trên đỉnh Fansipan, khi Anh ngỏ lời với Huyền.</p>
+          </div>
+          <div class="w-full md:w-1/12 flex justify-center">
+            <div class="w-6 h-6 bg-blue-400 rounded-full border-4 border-white"></div>
+          </div>
+          <div class="hidden md:block w-1/2"></div>
+        </div>
+        <div class="mb-12 flex items-center w-full flex-col md:flex-row-reverse">
+          <div class="w-full md:w-1/2 pl-0 md:pl-8 text-center md:text-left">
+            <h3 class="text-lg font-semibold text-blue-600">Ngày Cưới</h3>
+            <p class="text-gray-600">20.12.2025</p>
+            <p class="text-gray-600">Ngày trọng đại chúng tôi cùng nhau viết tiếp câu chuyện tình yêu.</p>
+          </div>
+          <div class="w-full md:w-1/12 flex justify-center">
+            <div class="w-6 h-6 bg-blue-400 rounded-full border-4 border-white"></div>
+          </div>
+          <div class="hidden md:block w-1/2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Album ảnh -->
+  <section id="gallery" class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="cursive section-title text-center">Album</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
+          <img src="https://images.unsplash.com/photo-1519227355642-2f2a3a1a6e99?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 1" class="w-full h-64 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1511285560929-80b4564d73d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
+          <img src="https://images.unsplash.com/photo-1511285560929-80b4564d73d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 2" class="w-full h-64 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519748771451-4a3950ed7462?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
+          <img src="https://images.unsplash.com/photo-1519748771451-4a3950ed7462?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 3" class="w-full h-64 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
+          <img src="https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 4" class="w-full h-64 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1527527753514-2c84b332c858?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
+          <img src="https://images.unsplash.com/photo-1527527753514-2c84b332c858?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 5" class="w-full h-64 object-cover rounded-lg shadow-md">
+        </div>
+        <div class="photo-card fade-in" onclick="openModal('https://images.unsplash.com/photo-1519225422858-3f0e6b4e34f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')">
+          <img src="https://images.unsplash.com/photo-1519225422858-3f0e6b4e34f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gallery 6" class="w-full h-64 object-cover rounded-lg shadow-md">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal cho ảnh -->
+  <div id="modal" class="modal">
+    <span class="modal-close" onclick="closeModal()">×</span>
+    <img id="modal-image" src="" alt="Zoomed Image">
+  </div>
+
+  <!-- Form Gửi Quà -->
+  <section id="rsvp" class="py-12 bg-[#E6F3FA]">
+    <div class="container mx-auto px-4">
+      <h2 class="cursive section-title text-center">Gửi Quà</h2>
+      <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md backdrop-filter blur(3px)">
+        <div id="rsvp-form" class="space-y-4">
+          <div>
+            <label class="block text-gray-700 font-semibold">Họ Tên</label>
+            <input type="text" id="name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400" placeholder="Nhập họ tên của bạn">
+          </div>
+          <div>
+            <label class="block text-gray-700 font-semibold">Bạn sẽ tham dự?</label>
+            <select id="attending" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400">
+              <option value="">Chọn</option>
+              <option value="Có">Có</option>
+              <option value="Không">Không</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-700 font-semibold">Lời Nhắn</label>
+            <textarea id="message" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400" placeholder="Gửi lời chúc đến chúng tôi" rows="4"></textarea>
+          </div>
+          <button id="submit-btn" class="w-full bg-blue-400 text-white p-2 rounded-lg hover:bg-blue-500 transition">Gửi Xác Nhận</button>
+        </div>
+        <div id="rsvp-list" class="mt-4 text-gray-600"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lịch -->
+  <section id="calendar" class="py-12 bg-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="cursive section-title">Lịch Đám Cưới</h2>
+      <div class="calendar-container">
+        <div class="calendar">
+          <div class="calendar-day">Nhà Trai - 20/12/2025</div>
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th>Thời Gian</th>
+                <th>Sự Kiện</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>15:00</td>
+                <td>Đón dâu</td>
+              </tr>
+              <tr>
+                <td>17:00</td>
+                <td>Lễ gia tiên</td>
+              </tr>
+              <tr>
+                <td>18:00</td>
+                <td>Lễ cưới</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="calendar">
+          <div class="calendar-day">Nhà Gái - 20/12/2025</div>
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th>Thời Gian</th>
+                <th>Sự Kiện</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>14:00</td>
+                <td>Chuẩn bị lễ</td>
+              </tr>
+              <tr>
+                <td>16:30</td>
+                <td>Trang trí</td>
+              </tr>
+              <tr>
+                <td>18:00</td>
+                <td>Lễ cưới</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="calendar-event mt-4">Địa điểm: Trung tâm Tiệc cưới Hà Nội, 123 Đường Láng, Hà Nội</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 bg-[#0055A5] text-white text-center">
+    <p class="text-lg cursive">Anh & Huyền</p>
+    <p class="text-sm">Cảm ơn bạn đã cùng chia sẻ niềm vui với chúng tôi!</p>
+  </footer>
+
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCK_NIsHoz-ozl0aNrrtX6xBPn-1VDQQt4",
+      authDomain: "liemthao-1bf3a.firebaseapp.com",
+      projectId: "liemthao-1bf3a",
+      storageBucket: "liemthao-1bf3a.firebasestorage.app",
+      messagingSenderId: "602420931907",
+      appId: "1:602420931907:web:c47f904b8f214f89ce13f6",
+      measurementId: "G-36JWV4Y9ZZ"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Đếm ngược
+    function countdown() {
+      const weddingDate = new Date('2025-12-20T18:00:00').getTime();
+      const now = new Date().getTime();
+      const distance = weddingDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('minutes').textContent = minutes;
+      document.getElementById('seconds').textContent = seconds;
+
+      if (distance < 0) {
+        document.getElementById('countdown').innerHTML = 'Ngày cưới đã diễn ra!';
+      }
+    }
+    setInterval(countdown, 1000);
+
+    // Hiệu ứng trái tim rơi
+    function createHeart() {
+      const heartContainer = document.querySelector('.heart-container');
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = Math.random() * 2 + 6 + 's'; // Random duration between 6-8s
+      heart.style.opacity = Math.random() * 0.5 + 0.3;
+      heartContainer.appendChild(heart);
+      setTimeout(() => heart.remove(), 8000); // Remove after 8s to match max animation
+    }
+    function animateHearts(timestamp) {
+      if (!lastHeartTime || timestamp - lastHeartTime > 2000) { // Create heart every 2s
+        createHeart();
+        lastHeartTime = timestamp;
+      }
+      requestAnimationFrame(animateHearts);
+    }
+    let lastHeartTime = 0;
+    requestAnimationFrame(animateHearts);
+
+    // Hiệu ứng zoom ảnh
+    function openModal(src) {
+      const modal = document.getElementById('modal');
+      const modalImage = document.getElementById('modal-image');
+      modalImage.src = src;
+      modal.style.display = 'flex';
+    }
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+    }
+
+    // Xử lý form RSVP và lưu vào Firestore
+    document.getElementById('submit-btn').addEventListener('click', async function() {
+      const name = document.getElementById('name').value.trim();
+      const attending = document.getElementById('attending').value;
+      const message = document.getElementById('message').value.trim();
+
+      if (name && attending) {
+        try {
+          await addDoc(collection(db, 'rsvp'), {
+            name: name,
+            attending: attending,
+            message: message,
+            timestamp: new Date().toISOString()
+          });
+          alert(`Cảm ơn ${name} đã xác nhận! Tham dự: ${attending}\nLời nhắn: ${message}`);
+          document.getElementById('name').value = '';
+          document.getElementById('attending').value = '';
+          document.getElementById('message').value = '';
+        } catch (error) {
+          console.error('Error adding RSVP: ', error);
+          alert('Có lỗi xảy ra khi gửi xác nhận. Vui lòng thử lại!');
+        }
+      } else {
+        alert('Vui lòng điền đầy đủ họ tên và trạng thái tham dự!');
+      }
+    });
+
+    // Cập nhật danh sách RSVP từ Firestore
+    function updateRSVPList() {
+      const rsvpDisplay = document.getElementById('rsvp-list');
+      const q = query(collection(db, 'rsvp'), orderBy('timestamp', 'desc'));
+      onSnapshot(q, (snapshot) => {
+        const rsvpList = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          rsvpList.push(data);
+        });
+        rsvpDisplay.innerHTML = rsvpList.length 
+          ? '<h4 class="font-semibold text-blue-600">Danh sách xác nhận:</h4>' + 
+            rsvpList.map(r => `<p>${r.name} - ${r.attending} (${new Date(r.timestamp).toLocaleString()})</p>`).join('')
+          : '';
+      }, (error) => {
+        console.error('Error fetching RSVPs: ', error);
+        rsvpDisplay.innerHTML = '<p class="text-red-600">Không thể tải danh sách xác nhận. Vui lòng thử lại sau!</p>';
+      });
+    }
+    updateRSVPList();
+
+    // Hiệu ứng fade-in khi cuộn đến
+    function checkFadeIn() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top >= 0 && rect.top <= window.innerHeight) {
+          element.classList.add('visible');
+        }
+      });
+    }
+    window.addEventListener('scroll', checkFadeIn);
+    checkFadeIn();
+
+    // Xử lý hamburger menu
+    document.querySelector('.hamburger').addEventListener('click', () => {
+      const navMenu = document.querySelector('.nav-menu');
+      navMenu.classList.toggle('active');
+    });
+  </script>
+</body>
+</html>
+```
