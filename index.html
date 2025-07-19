@@ -371,6 +371,32 @@
         height: 100px;
       }
     }
+
+    .music-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      border: none;
+      cursor: pointer;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/727/727245.png');
+      background-size: 60%;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 999;
+    }
+
+    .music-player {
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      display: none;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -637,12 +663,34 @@
       </div>
     </div>
   </section>
+<div class="fixed bottom-6 right-6 z-50">
+  <button id="music-toggle"
+          class="fixed bottom-5 right-5 z-50 bg-white/30 backdrop-blur border border-white/50 shadow-lg hover:bg-white/50 transition-all p-3 rounded-full">
+    
+    <!-- Icon Play: Dodgerblue + Hiệu ứng nổi bật -->
+    <svg id="play-icon"
+         xmlns="http://www.w3.org/2000/svg"
+         class="w-6 h-6 fill-[dodgerblue] drop-shadow-[0_0_6px_dodgerblue] mix-blend-screen transition-all"
+         viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
 
-  
+    <!-- Icon Pause: giữ nguyên màu trắng -->
+    <svg id="pause-icon"
+         xmlns="http://www.w3.org/2000/svg"
+         class="w-6 h-6 fill-[dodgerblue] drop-shadow-[0_0_6px_dodgerblue] mix-blend-screen transition-all hidden"
+         viewBox="0 0 24 24">
+      <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
+    </svg>
+  </button>
+
+  <!-- Audio -->
+  <audio id="audio-player" src="https://firebasestorage.googleapis.com/v0/b/sunshine-app-production.appspot.com/o/2025-03-15T06%3A12%3A34_34935%2FLeDuong-KaiDinh-35863164.mp3?alt=media&token=21663061-3fe2-4e92-93c1-69743a2ea0ea"></audio>
+</div>
 
   <!-- Footer -->
   <footer class="py-8 bg-[#0055A5] text-white text-center">
-    <p class="text-lg cursive">Liêm & Thảo</p>
+    <p class="text-lg cursive text-white text-bold">Liêm & Thảo</p>
     <p class="text-sm">Cảm ơn bạn đã cùng chia sẻ niềm vui với chúng tôi!</p>
   </footer>
 
@@ -766,6 +814,40 @@
       const navMenu = document.querySelector('.nav-menu');
       navMenu.classList.toggle('active');
     });
+
+
+    // Xử lí phát âm thanh
+  const audio = document.getElementById('audio-player');
+  const toggleBtn = document.getElementById('music-toggle');
+  const playIcon = document.getElementById('play-icon');
+  const pauseIcon = document.getElementById('pause-icon');
+  let isPlaying = false;
+
+  toggleBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+  });
+
+  audio.addEventListener('play', () => {
+    isPlaying = true;
+    playIcon.classList.add('hidden');
+    pauseIcon.classList.remove('hidden');
+  });
+
+  audio.addEventListener('pause', () => {
+    isPlaying = false;
+    playIcon.classList.remove('hidden');
+    pauseIcon.classList.add('hidden');
+  });
+
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    playIcon.classList.remove('hidden');
+    pauseIcon.classList.add('hidden');
+  });
   </script>
 </body>
 </html>
