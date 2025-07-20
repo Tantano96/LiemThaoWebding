@@ -257,9 +257,9 @@
     }
     .calendar-event {
       font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
+      font-size: 1rem;
       color: #0055A5;
-      margin-top: 1.5rem;
+      margin-top: 1.2rem;
       text-align: center;
     }
     .hamburger {
@@ -277,23 +277,16 @@
     .qr-section img {
       width: 150px;
       height: 150px;
-      border: 3px solid #007BFF;
       border-radius: 8px;
       margin: 0.5rem auto;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .qr-section img:hover {
       transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(0, 85, 165, 0.3);
     }
     .map-section {
       margin-top: 2rem;
       padding: 1.5rem;
-      background: linear-gradient(135deg, #ffffff, #f8fafc);
-      border-radius: 12px;
-      box-shadow: 0 6px 16px rgba(0, 85, 165, 0.15);
-      border: 1px solid #e6f3fa;
-      backdrop-filter: blur(4px);
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
@@ -313,7 +306,6 @@
     .map-section img {
       width: 120px;
       height: 120px;
-      border: 3px solid #007BFF;
       border-radius: 8px;
       margin: 0.5rem auto;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -326,9 +318,20 @@
       width: 100%;
       height: 300px;
       border-radius: 12px;
-      border: 2px solid #007BFF;
       box-shadow: 0 4px 12px rgba(0, 85, 165, 0.2);
     }
+    .map-section .map-qr {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-gap: 6px;
+    }
+     @media (max-width: 768px) {
+        .map-section .map-qr {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-gap: 0px;
+        }
+     }
     .line-path {
       display: block !important;
     }
@@ -403,6 +406,58 @@
       display: none;
       z-index: 999;
     }
+
+
+    /* Timeline Styling */
+.timeline {
+  gap: 2rem;
+}
+
+.timeline-item {
+  flex: 1;
+  padding: 0;
+}
+
+.timeline-item img {
+  display: block;
+  margin-right: 1rem;
+  min-width: 2rem;
+}
+
+.timeline-item div {
+  flex: 1;
+}
+
+.ceremony-details {
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
+  box-shadow: 0 4px 12px rgba(0, 85, 165, 0.1);
+}
+
+/* Seaside Illustration */
+.seascape {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .timeline {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .timeline-item {
+    width: 100%;
+  }
+
+  .ceremony-details {
+    padding: 1rem;
+  }
+
+  .seascape {
+    max-width: 80%;
+  }
+}
   </style>
 </head>
 <body>
@@ -527,7 +582,7 @@
   <section id="gallery" class="py-12 bg-white">
     <div class="container mx-auto px-4">
       <h2 class="cursive section-title">Album</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         <div class="photo-card fade-in" onclick="openModal('https://liemthao1996.my.canva.site/_assets/media/e3bba2cc55e0717238fd37a2a332db64.png')">
           <img src="https://liemthao1996.my.canva.site/_assets/media/e3bba2cc55e0717238fd37a2a332db64.png" alt="Gallery 2" class="w-full h-128 object-cover rounded-lg shadow-md">
         </div>
@@ -556,6 +611,78 @@
     </div>
   </section>
 
+
+  <section id="calendar" class="py-12 bg-white relative">
+  <!-- Subtle Background Overlay -->
+  <div class="absolute inset-0 bg-[url('https://www.svgbackgrounds.com/set/free-floral-patterns/light-floral/')] bg-cover bg-center opacity-5"></div>
+  <div class="container mx-auto px-4 text-center relative z-10">
+    <h2 class="cursive section-title text-blue-800">Lịch Đám Cưới</h2>
+    <!-- Ceremony Details -->
+    <div class="ceremony-details max-w-md mx-auto mb-8 p-6 bg-gradient-to-b from-white to-[#f8fafc]">
+      <div class="flex justify-center gap-4 mb-4">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E" alt="Floral Icon" class="w-12 h-12">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3Cpath d='M12 18v-6l-4-2'/%3E%3C/svg%3E" alt="Rings Icon" class="w-12 h-12">
+      </div>
+      <h3 class="text-2xl font-semibold text-blue-800 cursive">Lễ Thành Hôn</h3>
+      <p class="text-blue-800 mt-2 font-bold">Được tổ chức vào lúc 17 giờ 30 phút</p>
+      <p class="text-blue-800 font-bold text-3xl">Thứ 2</p>
+      <div class="flex justify-center gap-4 mt-2">
+        <p class="text-blue-800 font-bold border-t border-b border-blue-800 py-1">Tháng 7</p>
+        <p class="text-blue-800 font-bold text-4xl">28</p>
+        <p class="text-blue-800 font-bold">Năm 2025</p>
+      </div>
+      <p class="text-blue-800 italic mt-2">(Tức ngày 10 tháng 02 năm Ất Tỵ)</p>
+      <p class="text-blue-800 mt-2">Tại nhà riêng của nhà trai</p>
+      <p class="text-blue-800 font-semibold">Địa chỉ: Khoái Nội, Chương Dương, Hà Nội</p>
+      <a href="https://maps.google.com/?q=Khoái+Nội,+Chương+Dương,+Hà+Nội" target="_blank" class="inline-flex items-center mt-4 text-blue-800 hover:text-blue-600 transition">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E" alt="Location Icon" class="w-5 h-5 mr-2">
+        Chỉ đường
+      </a>
+    </div>
+    <!-- Wedding Schedule -->
+    <div class="calendar-container max-w-2xl mx-auto">
+      <div class="calendar p-6 bg-gradient-to-b from-white to-[#f8fafc]">
+        <div class="timeline flex flex-col gap-6 text-left">
+          <div class="timeline-item flex items-start">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E" alt="Clock Icon" class="w-8 h-8 mr-4">
+            <div class="flex-1">
+              <p class="text-lg font-semibold text-blue-800">17:30</p>
+              <p class="text-blue-800 font-bold">Đón Khách</p>
+              <p class="text-blue-800">Check in với photobook và gửi lời chúc đến dâu rể</p>
+            </div>
+          </div>
+          <div class="timeline-item flex items-start">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/%3E%3Cpath d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'/%3E%3C/svg%3E" alt="Book Icon" class="w-8 h-8 mr-4">
+            <div class="flex-1">
+              <p class="text-lg font-semibold text-blue-800">18:00</p>
+              <p class="text-blue-800 font-bold">Lễ Gia Tiên</p>
+              <p class="text-blue-800">Nghi thức truyền thống tại nhà trai</p>
+            </div>
+          </div>
+          <div class="timeline-item flex items-start">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Cpath d='M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'/%3E%3C/svg%3E" alt="Party Icon" class="w-8 h-8 mr-4">
+            <div class="flex-1">
+              <p class="text-lg font-semibold text-blue-800">18:30</p>
+              <p class="text-blue-800 font-bold">Tiệc Cưới</p>
+              <p class="text-blue-800">Chung vui cùng cô dâu và chú rể</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Map Section -->
+    <div class="map-section mt-8">
+      <h3 class="fade-in text-blue-800 cursive">Bản Đồ Địa Điểm</h3>
+      <p class="fade-in text-blue-800">Quét mã QR hoặc nhấp vào bản đồ để điều hướng.</p>
+      <div class="map-qr">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://maps.google.com/?q=Khoái+Nội,+Chương+Dương,+Hà+Nội" alt="Map QR Code" class="mx-auto fade-in">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.5062000000003!2d105.801944!3d21.011305!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDAwJzQwLjciTiAxMDXCsDQ4JzA3LjAiRQ!5e0!3m2!1svi!2s!4v1634567890123" allowfullscreen="" loading="lazy" class="fade-in"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
   <!-- Modal cho ảnh -->
   <div id="modal" class="modal">
     <span class="modal-close" onclick="closeModal()">×</span>
@@ -569,6 +696,7 @@
       <div class="calendar-container">
         <div class="calendar">
           <div class="calendar-day">Nhà Trai - 28/07/2025</div>
+          <div class="calendar-event">Địa điểm:  Nhà XX, Thôn Khoái Nội, Xã Chương Dương, Hà Nội</div>
           <table class="calendar-table">
             <thead>
               <tr>
@@ -594,6 +722,7 @@
         </div>
         <div class="calendar">
           <div class="calendar-day">Nhà Gái - 28/07/2025</div>
+          <div class="calendar-event">Địa điểm:  Nhà XX, Thôn Khoái Nội, Xã Chương Dương, Hà Nội</div>
           <table class="calendar-table">
             <thead>
               <tr>
@@ -617,13 +746,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-      <div class="calendar-event">Địa điểm:  Nhà XX, Thôn Khoái Nội, Xã Chương Dương, Hà Nội</div>
-      <div class="map-section">
-        <h3 class="fade-in">Bản Đồ Địa Điểm</h3>
-        <p class="fade-in">Quét mã QR hoặc nhấp vào bản đồ để điều hướng đến địa điểm tiệc cưới.</p>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://maps.google.com/?q=123+Đường+Láng,+Hà+Nội" alt="Map QR Code" class="mx-auto fade-in">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.5062000000003!2d105.801944!3d21.011305!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDAwJzQwLjciTiAxMDXCsDQ4JzA3LjAiRQ!5e0!3m2!1svi!2s!4v1634567890123" allowfullscreen="" loading="lazy" class="fade-in"></iframe>
       </div>
     </div>
   </section>
